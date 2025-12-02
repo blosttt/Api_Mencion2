@@ -1,0 +1,47 @@
+-- ==============================
+-- TABLA DISTRIBUIDORES
+-- ==============================
+CREATE TABLE Distribuidores (
+    id_distribuidor INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    rut VARCHAR(15) UNIQUE NOT NULL,
+    telefono VARCHAR(20),
+    email VARCHAR(100),
+    direccion VARCHAR(150),
+    ciudad VARCHAR(50)
+);
+
+-- ==============================
+-- TABLA CATEGORIAS
+-- ==============================
+CREATE TABLE Categorias (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_categoria VARCHAR(50) UNIQUE NOT NULL -- Ej: Aire, Aceite, Combustible, Habitáculo
+);
+
+-- ==============================
+-- TABLA FILTROS (PRODUCTOS)
+-- ==============================
+CREATE TABLE Filtros (
+    id_filtro INT AUTO_INCREMENT PRIMARY KEY,
+    codigo_producto VARCHAR(50) UNIQUE NOT NULL,
+    nombre_filtro VARCHAR(100) NOT NULL,
+    id_categoria INT NOT NULL,
+    marca VARCHAR(50) NOT NULL,
+    descripcion TEXT,
+
+    -- PRECIOS
+    precio_compra DECIMAL(10,2) NOT NULL,      -- Costo del distribuidor
+    margen_ganancia DECIMAL(5,2) DEFAULT 30,  -- % de ganancia
+    precio_neto DECIMAL(10,2) GENERATED ALWAYS AS (precio_compra * (1 + margen_ganancia/100)) STORED,
+    iva DECIMAL(10,2) GENERATED ALWAYS AS (precio_neto * 0.19) STORED,
+    precio_venta DECIMAL(10,2) GENERATED ALWAYS AS (precio_neto + iva) STORED,
+
+    -- STOCK Y PROVEEDOR
+    stock INT DEFAULT 0,
+    id_distribuidor INT,
+    fecha_actualizacion DATE DEFAULT (CURRENT_DATE),
+
+    CONSTRAINT fk_categoria FOREIGN KEY (id_categoria) REFERENCES Categorias(id_categoria),
+    CONSTRAINT fk_distribuidor FOREIGN KEY (id_distribuidor) REFERENCES Distribuidores(id_distribuidor)
+);
